@@ -6,23 +6,21 @@ import numpy as np
 def resize_image_itk(itkimage, newSize, resamplemethod=sitk.sitkNearestNeighbor):
 
     resampler = sitk.ResampleImageFilter()
-    originSize = itkimage.GetSize()  # 原来的体素块尺寸 h,w,d
+    originSize = itkimage.GetSize()
     originSpacing = itkimage.GetSpacing()
-    newSize = np.array(newSize,float)# h,w,d
+    newSize = np.array(newSize,float)
     factor = originSize / newSize
     newSpacing = originSpacing * factor
-    newSize = newSize.astype(np.int) #spacing肯定不能是整数
-    resampler.SetReferenceImage(itkimage)  # 需要重新采样的目标图像
+    newSize = newSize.astype(np.int)
+    resampler.SetReferenceImage(itkimage)
     resampler.SetSize(newSize.tolist())
     resampler.SetOutputSpacing(newSpacing.tolist())
     resampler.SetTransform(sitk.Transform(3, sitk.sitkIdentity))
     resampler.SetInterpolator(resamplemethod)
-    itkimgResampled = resampler.Execute(itkimage)  # 得到重新采样后的图像
+    itkimgResampled = resampler.Execute(itkimage)
     return itkimgResampled
 
 def oblique_project(pred, angle = 67.5):
-    # 斜投影会损失一部分边界信息！
-    # 相当于确定max(1)是0度！！
     """
     This function projects 3d voxel data into 2d data at different angles/views
 
@@ -113,9 +111,11 @@ def proj_make_3dinput_v2(project, angle = 15, start_slice = [0,0,0], crop_slice 
     """
     This function unprojects 2d data into 3d voxel at different angles/views and do crop.
 
-    :param pred: 3d voxel input 
+    :param project: 2d image input 
     :param angle: the angle of different view. set max(1) as 0.
-    :return pred_proj: 2d output 
+    :param start_slice: start slice of three dimension
+    :param crop_slice: crop ratio of three dimension
+    :return pred_proj: 3d output 
     """
     angle1 = angle
     h = project.shape[0]
@@ -125,9 +125,9 @@ def proj_make_3dinput_v2(project, angle = 15, start_slice = [0,0,0], crop_slice 
         label = project
         l1 = round((1.0/math.tan(math.radians(angle)))*l)
 
-        L = round((w**2+l1**2)**0.5*angle/45)#*angle/45?
+        L = round((w**2+l1**2)**0.5*angle/45)
         p = round((L-l)/2)
-        project = np.pad(project,((0,0),(p,p)),'constant', constant_values=(0,0)) #1023,395
+        project = np.pad(project,((0,0),(p,p)),'constant', constant_values=(0,0))
         pred_proj = cv2.resize(project,(l1+w-1, h))
         # crop
         s1 = round(start_slice[1]*w)
@@ -151,9 +151,9 @@ def proj_make_3dinput_v2(project, angle = 15, start_slice = [0,0,0], crop_slice 
         angle = 90-angle
         w1 = round((1.0/math.tan(math.radians(angle)))*l)
         
-        L = round((w1**2+l**2)**0.5*angle/45)#*angle/45?
+        L = round((w1**2+l**2)**0.5*angle/45)
         p = round((L-l)/2)
-        project = np.pad(project,((0,0),(p,p)),'constant', constant_values=(0,0)) #1023,395
+        project = np.pad(project,((0,0),(p,p)),'constant', constant_values=(0,0))
         pred_proj = cv2.resize(project,(l+w1-1, h))
         # crop
         s1 = round(start_slice[1]*w1)
@@ -183,12 +183,12 @@ def proj_make_3dinput_v2(project, angle = 15, start_slice = [0,0,0], crop_slice 
         project = np.flip(project, 1)
         w1 = round((1.0/math.tan(math.radians(angle)))*l)
 
-        L = round((w1**2+l**2)**0.5*angle/45)#*angle/45?
+        L = round((w1**2+l**2)**0.5*angle/45)
         p = round((L-l)/2)
-        project = np.pad(project,((0,0),(p,p)),'constant', constant_values=(0,0)) #1023,395
+        project = np.pad(project,((0,0),(p,p)),'constant', constant_values=(0,0))
         pred_proj = cv2.resize(project,(l+w1-1, h))
         # crop
-        start_slice[1] = 1 - (start_slice[1] + crop_slice[1]) # flip
+        start_slice[1] = 1 - (start_slice[1] + crop_slice[1])
         s1 = round(start_slice[1]*w1)
         s2 = round(start_slice[2]*l)
         pred_proj = pred_proj[round(start_slice[0]*h):round((start_slice[0]+crop_slice[0])*h),:]
@@ -204,16 +204,16 @@ def proj_make_3dinput_v2(project, angle = 15, start_slice = [0,0,0], crop_slice 
         input3d_itk = sitk.GetImageFromArray(input3d)
         input3d_itk = resize_image_itk(input3d_itk, (round(crop_slice[2]*l), round(crop_slice[1]*w), round(crop_slice[0]*h)),resamplemethod=sitk.sitkLinear)
         input3d = sitk.GetArrayFromImage(input3d_itk)
-        start_slice[1] = 1 - (start_slice[1] + crop_slice[1]) # back 
+        start_slice[1] = 1 - (start_slice[1] + crop_slice[1]) 
     elif (angle > 135) & (angle < 180):
         label = project
         angle = 180 - angle
         project = np.flip(project, 1)
         l1 = round((1.0/math.tan(math.radians(angle)))*l)
 
-        L = round((w**2+l1**2)**0.5*angle/45)#*angle/45?
+        L = round((w**2+l1**2)**0.5*angle/45)
         p = round((L-l)/2)
-        project = np.pad(project,((0,0),(p,p)),'constant', constant_values=(0,0)) #1023,395
+        project = np.pad(project,((0,0),(p,p)),'constant', constant_values=(0,0))
         pred_proj = cv2.resize(project,(l1+w-1, h))
         # crop
         start_slice[1] = 1 - (start_slice[1] + crop_slice[1])
@@ -232,29 +232,11 @@ def proj_make_3dinput_v2(project, angle = 15, start_slice = [0,0,0], crop_slice 
         input3d_itk = sitk.GetImageFromArray(input3d)
         input3d_itk = resize_image_itk(input3d_itk, (round(crop_slice[2]*l), round(crop_slice[1]*w), round(crop_slice[0]*h)),resamplemethod=sitk.sitkLinear)
         input3d = sitk.GetArrayFromImage(input3d_itk)
-        start_slice[1] = 1 - (start_slice[1] + crop_slice[1]) # back 
+        start_slice[1] = 1 - (start_slice[1] + crop_slice[1])
     elif angle == 180:
         label = project
         project = np.flip(project, 1)
         pred_proj = project[round(start_slice[0]*h):round((start_slice[0]+crop_slice[0])*h),
                             round(start_slice[2]*l):round((start_slice[2]+crop_slice[2])*l)]
         input3d = np.expand_dims(pred_proj, 1).repeat(pred_proj.shape[1], axis=1)
-
-    # # test
-    # label_proj = label
-    # input_proj = oblique_project1(input3d, angle1)
-    # if angle1 > 90:
-    #     input_proj1 = oblique_project1(input3d, angle1-90)
-    # elif angle1 <= 90:
-    #     input_proj1 = oblique_project1(input3d, angle1+90)
-    # concat = np.concatenate((input_proj,label_proj), axis=1)
-    # plt.imshow(concat, cmap="gray")
-    # plt.savefig('/home/zhenghongzhou/repo/DSA_reconstruct/train8_U-net/result_21_realweak12view/concat_proj_'+str(angle1)+'.jpg')
-    # plt.imshow(input_proj, cmap="gray")
-    # plt.savefig('/home/zhenghongzhou/repo/DSA_reconstruct/train8_U-net/result_21_realweak12view/input_proj_'+str(angle1)+'.jpg')
-    # plt.imshow(label_proj, cmap="gray")
-    # plt.savefig('/home/zhenghongzhou/repo/DSA_reconstruct/train8_U-net/result_21_realweak12view/label_proj_'+str(angle1)+'.jpg')
-    # plt.imshow(input_proj1, cmap="gray")
-    # plt.savefig('/home/zhenghongzhou/repo/DSA_reconstruct/train8_U-net/result_21_realweak12view/input_proj_'+str(angle1+90)+'.jpg')
-
     return input3d

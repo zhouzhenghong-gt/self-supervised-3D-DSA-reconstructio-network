@@ -13,8 +13,6 @@ def threshold_CTA_mask(cta_image, HU_window=np.array([-263.,553.])):
     th_cta_image[th_cta_image < 0] = 0
     th_cta_image[th_cta_image > 1] = 1
     th_cta_image_mask = th_cta_image
-    # th_cta_image_mask = (th_cta_image*255).astype('uint8')
-    # th_cta_image_mask = (th_cta_image*1023).astype('uint16')
     return th_cta_image_mask
 
 class DSAReconDataset(Dataset):

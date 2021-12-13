@@ -1,7 +1,6 @@
 import os
 from time import time
 
-# import parser
 import argparse
 import torch
 import math
@@ -11,7 +10,6 @@ from torch.utils.data import DataLoader
 from tensorboardX import SummaryWriter
 from datetime import datetime as dt
 
-# from net.ResUnet import net
 from net.U_Net3D import unet_3D
 from loss.mse_loss import MSELoss
 from load_data import DSAReconDataset
@@ -70,7 +68,7 @@ if __name__ == '__main__':
         net = unet_3D(in_channels=views)
     else:
         net = unet_3D(in_channels=views+1)
-    net = torch.nn.DataParallel(net,device_ids=range(torch.cuda.device_count())).cuda() # 留一张卡
+    net = torch.nn.DataParallel(net,device_ids=range(torch.cuda.device_count())).cuda()
     if args.pretrain_model_path is not None:
         net.load_state_dict(torch.load(args.pretrain_model_path))
 
@@ -125,8 +123,6 @@ if __name__ == '__main__':
             if step % 4 == 0:
                 print('epoch:{}, step:{}, loss:{:.3f}, time:{:.3f} min'
                     .format(epoch, step, loss.item(), (time() - start) / 60))
-                # with open(result_path + '/result_UNet.txt','a') as f:
-                #     f.write('epoch='+str(epoch)+'  train_loss= '+str(loss.item())+ '  time='+str((time() - start) / 60)+'  lr= '+str(lr_)+'\n')
             n_itr = epoch * math.floor(50/batch_size) + step
             train_writer.add_scalar('TrainBatchLoss', loss.item(), n_itr)
 

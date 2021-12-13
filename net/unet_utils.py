@@ -250,9 +250,6 @@ class UnetUp3(nn.Module):
 
     def forward(self, inputs1, inputs2):
         outputs2 = self.up(inputs2)
-        # offset = outputs2.size()[2] - inputs1.size()[2]
-        # padding = 2 * [offset // 2, offset // 2, 0] # //是表示向下取整的除法
-        # outputs1 = F.pad(inputs1, padding) # padding前两个两个表示pad inputs1最后
         offset2 = outputs2.size()[2] - inputs1.size()[2]
         offset3 = outputs2.size()[3] - inputs1.size()[3]
         offset4 = outputs2.size()[4] - inputs1.size()[4]
