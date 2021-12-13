@@ -1,0 +1,9 @@
+argparse
+matplotlib
+numpy
+opencv-python
+scipy
+torchvision
+tensorboardX
+SimpleITK
+pandas
