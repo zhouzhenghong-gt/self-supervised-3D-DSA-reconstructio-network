@@ -25,7 +25,6 @@ for stage 1
 ```
 CUDA_VISIBLE_DEVICES=0 python3 train.py \
 --stage 1 \
---3d_path  your_3d_path\
 --train_input_path  your_train_input_path\
 --result_path  your_result_path\
 --view_num 6
@@ -35,7 +34,6 @@ for stage 2
 ```
 CUDA_VISIBLE_DEVICES=0 python3 train.py \
 --stage 2 \
---3d_path  your_3d_path\
 --train_input_path  your_train_input_path\
 --result_path  your_result_path\
 --last_stage_path  your_last_stage_path\
