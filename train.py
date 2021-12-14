@@ -19,7 +19,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='DSA 3D Reconstruction Training')
     parser.add_argument('--train_input_path', type=str,
                         help='2d input image and 2d label')
-    parser.add_argument('--train_output_path', type=str,
+    parser.add_argument('--3d_path', type=str,
                         help='3d label to calculate metrics')
     parser.add_argument('--result_path', type=str,
                         help='training output path that save result')
@@ -74,9 +74,9 @@ if __name__ == '__main__':
 
     # Dataloader
     if stage == 1:
-        train_dataset = DSAReconDataset(stage, views, args.train_input_path, args.train_output_path)
+        train_dataset = DSAReconDataset(stage, views, args.train_input_path, args.3d_path)
     else:
-        train_dataset = DSAReconDataset(stage, views, args.train_input_path, args.train_output_path, args.last_stage_path)
+        train_dataset = DSAReconDataset(stage, views, args.train_input_path, args.3d_path, args.last_stage_path)
     train_dl = DataLoader(train_dataset, batch_size, True, num_workers=num_workers, pin_memory=pin_memory)
 
     # Loss function
