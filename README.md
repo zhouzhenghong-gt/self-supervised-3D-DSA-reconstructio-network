@@ -82,6 +82,9 @@ CUDA_VISIBLE_DEVICES=0 python3 validate.py \
 --view_num 8 
 ```
 
+# Acknowledgements
+Some code references [abdominal-multi-organ-segmentation](https://github.com/assassint2017/abdominal-multi-organ-segmentation)
+
 # License
 This project is open sourced under MIT license.
 
