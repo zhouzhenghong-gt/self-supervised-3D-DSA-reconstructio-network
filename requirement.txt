@@ -7,3 +7,5 @@ torchvision
 tensorboardX
 SimpleITK
 pandas
+xlsxwriter
+skimage

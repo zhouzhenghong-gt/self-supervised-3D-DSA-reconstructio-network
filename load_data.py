@@ -81,7 +81,7 @@ class DSAReconDataset(Dataset):
         
         # use last stage output as input
         if self.stage > 1:
-            assert self.last_path==None
+            assert self.last_path!=None
             image_nii = sitk.ReadImage(self.last_path + '/predict'+str(file_index)+'.nii.gz')
             projs[views] = sitk.GetArrayFromImage(image_nii)[start_slice0:end_slice0, start_slice1:end_slice1, start_slice2:end_slice2] 
 

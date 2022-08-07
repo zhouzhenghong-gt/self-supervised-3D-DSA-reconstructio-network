@@ -20,7 +20,7 @@ if __name__ == '__main__':
     parser.add_argument('--train_input_path', type=str,
                         help='2d input image and 2d label')
     parser.add_argument('--result_path', type=str,
-                        help='training output path that save result')
+                        help='training output path that save logs and ckpt')
     parser.add_argument('--epoch', type=int, default=1500,
                         help='the number of epoch')
     parser.add_argument('--leaing_rate', type=float, default=1e-3,
@@ -30,7 +30,7 @@ if __name__ == '__main__':
     parser.add_argument('--optim', type=str, default='adam',
                         help='network optimizer')
     parser.add_argument('--train_batch_size', type=int, default=3,
-                        help='Batch size for training')
+                        help='batch size for training')
     parser.add_argument('--num_workers', type=int, default=4,
                         help='Number of workers for dataloader')
     parser.add_argument('--stage', type=int, default=1,
@@ -43,7 +43,7 @@ if __name__ == '__main__':
                         help='number of views for the image input')
     parser.add_argument("--loss", type=str, default='MSE',
                         help='loss function')
-    parser.add_argument("--check_point_save", type=int, default=50,
+    parser.add_argument("--check_point_save", type=int, default=100,
                         help='epoch interval to save the model.pth')
     parser.add_argument("--pretrain_model_path", type=str, default=None,
                         help='path of pretrain model')
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     perangle = 180/views
     batch_size = args.train_batch_size
     num_workers = args.num_workers
-    pin_memory = True
+    pin_memory = False
     stage = args.stage
 
     # Network
@@ -66,7 +66,8 @@ if __name__ == '__main__':
         net = unet_3D(in_channels=views)
     else:
         net = unet_3D(in_channels=views+1)
-    net = torch.nn.DataParallel(net,device_ids=range(torch.cuda.device_count())).cuda()
+    net = net.cuda()
+    # net = torch.nn.DataParallel(net.cuda(),device_ids=range(torch.cuda.device_count()))
     if args.pretrain_model_path is not None:
         net.load_state_dict(torch.load(args.pretrain_model_path))
 
@@ -91,9 +92,18 @@ if __name__ == '__main__':
 
     # log
     result_path = args.result_path
-    output_dir = os.path.join(result_path, '%s', dt.now().isoformat())
-    log_dir = output_dir % 'logs'
-    ckpt_dir = output_dir % 'checkpoints'
+    if not os.path.exists(result_path):
+        os.makedirs(result_path)
+    if not os.path.exists(os.path.join(result_path, 'logs')):
+        os.mkdir(os.path.join(result_path, 'logs'))
+    if not os.path.exists(os.path.join(result_path, 'checkpoints')):
+        os.mkdir(os.path.join(result_path, 'checkpoints'))
+    log_dir = os.path.join(result_path, 'logs', dt.now().isoformat())
+    ckpt_dir = os.path.join(result_path, 'checkpoints', dt.now().isoformat())
+    if not os.path.exists(log_dir):
+        os.mkdir(log_dir)
+    if not os.path.exists(ckpt_dir):
+        os.mkdir(ckpt_dir)
     train_writer = SummaryWriter(os.path.join(log_dir, 'train'))
     start = time()
 
@@ -126,16 +136,17 @@ if __name__ == '__main__':
 
         mean_loss = sum(mean_loss) / len(mean_loss)
         train_writer.add_scalar('TrainEpochLoss', mean_loss, epoch)
+        # print('TrainEpochLoss:',epoch, mean_loss)
 
         # save checkpoint
         cptn = args.check_point_save
-        if (epoch+1) % cptn == 0:
+        if (epoch+1) % cptn == 0 or (epoch == Epoch-2):
             if not os.path.exists(ckpt_dir):
                 os.makedirs(ckpt_dir)
             torch.save(net.state_dict(), ckpt_dir + '/UNet{}-{:.3f}-{:.3f}.pth'.format(epoch, loss.item(), mean_loss))
 
         # save visualization output
-        if (epoch+1) % cptn == 0 or epoch == 0:
+        if (epoch+1) % cptn == 0 or epoch == 0 :
             index = 0
             # check label project
             label = seg[index,:,:,:].cpu()
