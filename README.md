@@ -6,7 +6,7 @@ The proposed self-supervised deep learning method can be used to realize excelle
 
 Note: This is a preliminary release. We will further improve our code and release some data.
 
-This released code performs reconstruction experiments on digitally generated renderings, like DRR. Codes and methods for reconstruction of clinically acquired images is improving.
+The released code performs reconstruction experiments on digitally generated renderings, like DRR. Codes and methods for reconstruction of clinically acquired images is improving.
 
 
 # Installation Guide
