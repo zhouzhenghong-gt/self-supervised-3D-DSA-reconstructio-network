@@ -5,7 +5,8 @@
 The proposed self-supervised deep learning method can be used to realize excellent three-dimensional digital subtraction angiography reconstruction from a few 2D projection views for ultra-low dosage cerebrovascular imaging in clinics
 
 Note: This is a preliminary release. We will further improve our code and release some data.
-This released code performs reconstruction experiments on digitally generated renderings, like DRR. Codes and methods for reconstruction of clinically acquired images is improved.
+
+This released code performs reconstruction experiments on digitally generated renderings, like DRR. Codes and methods for reconstruction of clinically acquired images is improving.
 
 
 # Installation Guide
