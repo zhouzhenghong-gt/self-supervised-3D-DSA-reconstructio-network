@@ -5,6 +5,7 @@
 The proposed self-supervised deep learning method can be used to realize excellent three-dimensional digital subtraction angiography reconstruction from a few 2D projection views for ultra-low dosage cerebrovascular imaging in clinics
 
 Note: This is a preliminary release. We will further improve our code and release some data.
+This released code performs reconstruction experiments on digitally generated renderings, like DRR. Codes and methods for reconstruction of clinically acquired images is improved.
 
 
 # Installation Guide
@@ -21,7 +22,7 @@ pip install -r requirements.txt
 # Instructions for Use
 Using a computer with a NVIDIA 3090 GPU would takes about 20 hours for stage1, and 2-3 days for stage2. Since each sample is large, CPU performance also affects speed
 ## Dataset
-The dataset involves patient privacy and ethical issues. We will release part of the dataset and pretrained model after obtaining permission.
+The dataset involves patient privacy and ethical issues. We will release part of the dataset and pretrained model after obtaining permission. 
 
 ## Training the models
 Training model is divided into two stages, low-resolution reconstruction(128\*256\*256) and high-resolution reconstruction(395\*512\*512), where the input of high-resolution reconstruction includes low-resolution results and 2D projections
